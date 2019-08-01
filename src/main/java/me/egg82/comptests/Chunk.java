@@ -82,7 +82,6 @@ public class Chunk {
                 break;
             }
             power++;
-            System.out.println("Resized to power " + power);
         } while (true);
         retVal = new byte[totalBytes];
         outBuf.rewind();
