@@ -66,7 +66,7 @@ public class Region {
             IntBuffer header = getRegionHeader(fileBuffer);
 
             // Locations, Chunks
-            Set<Chunk> chunkSet = new HashSet<>();
+            Set<Chunk> chunkSet = new LinkedHashSet<>();
             for (int i = 0; i < 1024; i++) {
                 // Locations
                 int offset = header.get();
