@@ -69,8 +69,8 @@ public class Region {
                 // Locations
                 int offset = header.get();
                 offsets[i] = offset;
-                int length = 0;
-                if ((offset >> 8) <= sectors.length) {
+                int length = offset & 255;
+                if (length == 255 && (offset >> 8) <= sectors.length) {
                     // Get length from chunk header
                     fileBuffer.position((offset >> 8) * 4096);
                     length = (fileBuffer.getInt() + 4) / 4096 + 1;
