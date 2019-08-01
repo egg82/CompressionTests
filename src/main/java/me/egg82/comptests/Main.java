@@ -21,14 +21,13 @@ public class Main {
             throw new IllegalArgumentException("No valid regions found in the directory.");
         }
 
-        //for (File regionFile : regionFiles) {
+        for (File regionFile : regionFiles) {
             Region region;
             try {
-                region = new Region(regionFiles[0]);
+                region = new Region(regionFile);
             } catch (IOException ex) {
                 ex.printStackTrace();
-                return;
-                //continue;
+                continue;
             }
 
             System.out.println("Got region at " + region.getX() + ", " + region.getZ());
@@ -36,6 +35,6 @@ public class Main {
             for (Chunk chunk : region.getChunks()) {
                 System.out.println("Got chunk at " + chunk.getX() + ", " + chunk.getZ());
             }
-        //}
+        }
     }
 }
