@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
+import me.egg82.comptests.tests.generic.BaseByteTest;
 
 public class ZlibStream extends BaseByteTest {
     protected long compress(byte[] decompressedData) throws IOException {

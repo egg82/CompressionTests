@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.DataFormatException;
-import me.egg82.comptests.tests.ByteTest;
+import me.egg82.comptests.tests.generic.ByteTest;
+import me.egg82.comptests.tests.ZlibByteArray;
 import me.egg82.comptests.tests.ZlibStream;
 
 public class Main {
@@ -59,21 +60,29 @@ public class Main {
         regions = regionList.toArray(new Region[0]);
 
         System.out.println("Trying Zlib stream");
-
         try (
                 BufferedWriter ratioOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-stream-ratio.txt"), false));
                 BufferedWriter compressionTimeOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-stream-compression-time.txt"), false));
                 BufferedWriter decompressionTimeOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-stream-decompression-time.txt"), false))
         ) {
-            testZlibStream(ratioOutput, compressionTimeOutput, decompressionTimeOutput, System.lineSeparator());
+            test(new ZlibStream(), ratioOutput, compressionTimeOutput, decompressionTimeOutput, System.lineSeparator());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        System.out.println("Trying Zlib byte array");
+        try (
+                BufferedWriter ratioOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-bytearray-ratio.txt"), false));
+                BufferedWriter compressionTimeOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-bytearray-compression-time.txt"), false));
+                BufferedWriter decompressionTimeOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-bytearray-decompression-time.txt"), false))
+        ) {
+            test(new ZlibByteArray(), ratioOutput, compressionTimeOutput, decompressionTimeOutput, System.lineSeparator());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    private void testZlibStream(BufferedWriter ratioOutput, BufferedWriter compressionTimeOutput, BufferedWriter decompressionTimeOutput, String lineEnding) {
-        ByteTest test = new ZlibStream();
-
+    private void test(ByteTest test, BufferedWriter ratioOutput, BufferedWriter compressionTimeOutput, BufferedWriter decompressionTimeOutput, String lineEnding) {
         double regionRatio = 0.0d;
         long regionCompressionTime = 0L;
         long regionDecompressionTime = 0L;
@@ -116,6 +125,7 @@ public class Main {
         System.out.println("Avg. Compression ratio: " + ratioFormat.format(regionRatio / (double) regions.length));
         System.out.println("Avg. Compression time: " + (regionCompressionTime / regions.length) + "us");
         System.out.println("Avg. Decompression time: " + (regionDecompressionTime / regions.length) + "us");
+        System.out.println();
     }
 
     private File getJarDirectory() throws URISyntaxException {
