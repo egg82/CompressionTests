@@ -14,7 +14,7 @@ public class Chunk {
 
     public Chunk(int x, int z, byte compressionType, ByteBuffer compressedData) {
         this.x = x;
-        this.z = x;
+        this.z = z;
 
         this.compressionType = compressionType;
         this.compressedData = compressedData;

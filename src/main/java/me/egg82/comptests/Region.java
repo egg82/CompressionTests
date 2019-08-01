@@ -93,7 +93,7 @@ public class Region {
                     fileBuffer.get(tmpData);
                     compressedData.put(tmpData);
                     compressedData.rewind();
-                    chunkSet.add(new Chunk(chunkXOffset + i % 32, chunkZOffset + i / 32, compressionType, compressedData));
+                    chunkSet.add(new Chunk(chunkXOffset + (i & 31), chunkZOffset + (i >>> 5), compressionType, compressedData));
                 }
             }
             chunks = chunkSet.toArray(new Chunk[0]);
