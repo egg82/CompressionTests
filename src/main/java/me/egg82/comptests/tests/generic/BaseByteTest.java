@@ -1,4 +1,4 @@
-package me.egg82.comptests.tests;
+package me.egg82.comptests.tests.generic;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
