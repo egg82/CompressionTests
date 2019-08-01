@@ -31,11 +31,13 @@ public class Main {
                 continue;
             }
 
-            System.out.println("Got region at " + region.getX() + ", " + region.getZ());
-
             for (Chunk chunk : region.getChunks()) {
-                System.out.println("Got chunk at " + chunk.getX() + ", " + chunk.getZ());
+                testDeflateStream(chunk.getUncompressedData());
             }
         }
+    }
+
+    private void testDeflateStream(byte[] input) {
+
     }
 }

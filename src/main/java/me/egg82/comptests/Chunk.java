@@ -1,10 +1,12 @@
 package me.egg82.comptests;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.zip.DataFormatException;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 
 public class Chunk {
@@ -24,7 +26,14 @@ public class Chunk {
         this.z = z;
 
         this.compressionType = compressionType;
-        this.uncompressedData = inflate(compressedData);
+
+        if (compressionType == 0) {
+            this.uncompressedData = gzipDecompress(compressedData);
+        } else if (compressionType == 1) {
+            this.uncompressedData = inflate(compressedData);
+        } else {
+            this.uncompressedData = null;
+        }
 
         this.hash = Objects.hash(x, z);
     }
@@ -46,6 +55,40 @@ public class Chunk {
     }
 
     public int hashCode() { return hash; }
+
+    private byte[] gzipDecompress(byte[] input) throws IOException {
+        byte[] retVal;
+        ByteBuffer outBuf;
+        int power = 1;
+        int totalBytes = 0;
+        do {
+            boolean resize = false;
+            outBuf = ByteBuffer.allocateDirect(1024 * 64 * power);
+
+            try (GZIPInputStream inStream = new GZIPInputStream(new ByteArrayInputStream(input))) {
+                int decompressedBytes;
+                while ((decompressedBytes = inStream.read(decompressionBuffer)) > 0) {
+                    try {
+                        outBuf.put(decompressionBuffer, 0, decompressedBytes);
+                        totalBytes += decompressedBytes;
+                    } catch (BufferOverflowException ignored) {
+                        resize = true;
+                        totalBytes = 0;
+                        break;
+                    }
+                }
+            }
+
+            if (!resize) {
+                break;
+            }
+            power++;
+        } while (true);
+        retVal = new byte[totalBytes];
+        outBuf.rewind();
+        outBuf.get(retVal);
+        return retVal;
+    }
 
     private byte[] inflate(byte[] input) throws DataFormatException, IOException {
         byte[] retVal;
