@@ -2,6 +2,7 @@ package me.egg82.comptests;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.zip.DataFormatException;
 
 public class Main {
     public static void main(String[] args) { new Main(args); }
@@ -25,7 +26,7 @@ public class Main {
             Region region;
             try {
                 region = new Region(regionFile);
-            } catch (IOException ex) {
+            } catch (IOException | DataFormatException ex) {
                 ex.printStackTrace();
                 continue;
             }

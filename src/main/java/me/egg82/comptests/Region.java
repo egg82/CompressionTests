@@ -8,6 +8,7 @@ import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.*;
+import java.util.zip.DataFormatException;
 
 public class Region {
     private final Chunk[] chunks;
@@ -21,7 +22,7 @@ public class Region {
 
     private final int hash;
 
-    public Region(File regionFile) throws IOException {
+    public Region(File regionFile) throws IOException, DataFormatException {
         int chunkXOffset;
         int chunkZOffset;
 
@@ -60,6 +61,7 @@ public class Region {
         ) {
             MappedByteBuffer fileBuffer = fileIn.map(FileChannel.MapMode.READ_ONLY, 0, fileIn.size());
             fileBuffer.load();
+            fileBuffer.rewind();
 
             IntBuffer header = getRegionHeader(fileBuffer);
 
@@ -80,19 +82,18 @@ public class Region {
                         sectors[(offset >> 8) + j] = false;
                     }
                 } else if (length > 0) {
-                    System.err.println("Region file at \"" + regionFile.getAbsolutePath() + "\" has invalid chunk at " + (i % 32) + ", " + (i / 32) + " - length " + length);
+                    System.err.println("Invalid chunk: (" + (i % 32) + ", " + (i / 32) + ") Offset: " + (offset >> 8) + " Length: " + length + " runs off end file. " + regionFile);
                     continue;
                 }
 
                 // Chunks
                 if (offset > 0 && (offset >> 8) > 1 && !sectors[offset >> 8]) {
-                    fileBuffer.position((offset >> 8) * 4096 + 4); // +4 to skip the length int
+                    fileBuffer.position((offset >> 8) * 4096);
+                    length = fileBuffer.getInt();
+
                     byte compressionType = fileBuffer.get();
-                    ByteBuffer compressedData = ByteBuffer.allocateDirect(length - 1);
-                    byte[] tmpData = new byte[length - 1];
-                    fileBuffer.get(tmpData);
-                    compressedData.put(tmpData);
-                    compressedData.rewind();
+                    byte[] compressedData = new byte[length - 1];
+                    fileBuffer.get(compressedData);
                     chunkSet.add(new Chunk(chunkXOffset + (i & 31), chunkZOffset + (i >>> 5), compressionType, compressedData));
                 }
             }
@@ -123,11 +124,11 @@ public class Region {
     public boolean hasChunk(int chunkX, int chunkZ) { return !sectors[getChunkInt(chunkX, chunkZ)]; }
 
     private IntBuffer getRegionHeader(MappedByteBuffer region) {
-        ByteBuffer byteHeader = ByteBuffer.allocateDirect(8192);
+        ByteBuffer byteHeader = ByteBuffer.allocate(8192);
         while (byteHeader.hasRemaining()) {
             byteHeader.put(region.get());
         }
-        byteHeader.rewind();
+        byteHeader.clear();
         return byteHeader.asIntBuffer();
     }
 
