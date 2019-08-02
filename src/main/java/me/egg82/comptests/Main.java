@@ -109,8 +109,8 @@ public class Main {
 
             for (Chunk chunk : regions[i].getChunks()) {
                 try {
-                    test.testCompress(chunk.getUncompressedData(), 5);
-                    test.testDecompress(test.getCompressedData(chunk.getUncompressedData()), 5);
+                    test.testCompress(chunk.getUncompressedData(), 3);
+                    test.testDecompress(test.getCompressedData(chunk.getUncompressedData()), 3);
                     if (test.getCompressionRatio() != -1.0d) {
                         chunkRatio += test.getCompressionRatio();
                         ratioOutput.write(test.getCompressionRatio() + lineEnding);
