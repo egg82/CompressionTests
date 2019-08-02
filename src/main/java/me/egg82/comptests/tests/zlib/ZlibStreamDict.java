@@ -47,6 +47,7 @@ public class ZlibStreamDict extends BaseByteTest {
             }
         }
         inputStream.close();
+        inflater.reset();
     }
 
     public byte[] getDecompressedData(byte[] compressedData) throws IOException {
@@ -69,6 +70,7 @@ public class ZlibStreamDict extends BaseByteTest {
         }
         inputStream.close();
         outputStream.close();
+        inflater.reset();
         return outputStream.toByteArray();
     }
 

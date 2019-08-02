@@ -92,6 +92,7 @@ public class Main {
             testWithOutput(new ZlibStream(), jarDirectory, "zlib-stream");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zlib stream (with dictionary)");
@@ -101,6 +102,7 @@ public class Main {
             testWithOutput(new ZlibStreamDict(zlibDict), jarDirectory, "zlib-stream-dict");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zlib byte array");
@@ -110,6 +112,7 @@ public class Main {
             testWithOutput(new ZlibByteArray(), jarDirectory, "zlib-bytearray");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zlib byte array (with dict)");
@@ -119,6 +122,7 @@ public class Main {
             testWithOutput(new ZlibByteArrayDict(zlibDict), jarDirectory, "zlib-bytearray-dict");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zlib direct ByteBuffer");
@@ -128,6 +132,7 @@ public class Main {
             testWithOutput(new ZlibDirectByteBuffer(), jarDirectory, "zlib-bytebuffer");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zlib direct ByteBuffer (with dict)");
@@ -137,6 +142,7 @@ public class Main {
             testWithOutput(new ZlibDirectByteBufferDict(zlibDict), jarDirectory, "zlib-bytebuffer-dict");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying LZ4 stream");
@@ -146,6 +152,7 @@ public class Main {
             testWithOutput(new LZ4Stream(), jarDirectory, "lz4-stream");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zstd stream");
@@ -155,6 +162,7 @@ public class Main {
             testWithOutput(new ZstdStream(), jarDirectory, "zstd-stream");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zstd stream (with dict)");
@@ -164,6 +172,7 @@ public class Main {
             testWithOutput(new ZstdStreamDict(zstdDict), jarDirectory, "zstd-stream-dict");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zstd byte array");
@@ -173,6 +182,7 @@ public class Main {
             testWithOutput(new ZstdByteArray(), jarDirectory, "zstd-bytearray");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zstd byte array (with dict)");
@@ -182,6 +192,7 @@ public class Main {
             testWithOutput(new ZstdByteArrayDict(zstdDict), jarDirectory, "zstd-bytearray-dict");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zstd direct ByteBuffer");
@@ -191,6 +202,7 @@ public class Main {
             testWithOutput(new ZstdDirectByteBuffer(), jarDirectory, "zstd-bytearray");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
 
         System.out.println("Verifying Zstd direct ByteBuffer (with dict)");
@@ -200,6 +212,7 @@ public class Main {
             testWithOutput(new ZstdDirectByteBufferDict(zstdDict), jarDirectory, "zstd-bytearray-dict");
         } else {
             System.err.println("Verification failed!");
+            System.out.println();
         }
     }
 
