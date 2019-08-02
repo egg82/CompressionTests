@@ -72,6 +72,9 @@ public class ZlibByteArrayDict extends BaseByteTest {
             totalBytes += decompressedBytes;
         }
         inflater.reset();
+
+        byte[] out = new byte[totalBytes];
+        System.arraycopy(outBuf, 0, out, 0, totalBytes);
     }
 
     public byte[] getCompressedData(byte[] decompressedData) throws IOException {

@@ -10,6 +10,7 @@ import java.util.zip.DataFormatException;
 import me.egg82.comptests.tests.generic.ByteTest;
 import me.egg82.comptests.tests.lz4.LZ4Stream;
 import me.egg82.comptests.tests.zlib.*;
+import me.egg82.comptests.tests.zstd.*;
 
 public class Main {
     public static void main(String[] args) { new Main(args); }
@@ -93,6 +94,24 @@ public class Main {
 
         System.out.println("Trying LZ4 stream");
         testWithOutput(new LZ4Stream(), jarDirectory, "lz4-stream");
+
+        System.out.println("Trying Zsd stream");
+        testWithOutput(new ZstdStream(), jarDirectory, "zstd-stream");
+
+        System.out.println("Trying Zsd stream (with dict)");
+        testWithOutput(new ZstdStreamDict(zstdDict), jarDirectory, "zstd-stream-dict");
+
+        System.out.println("Trying Zsd byte array");
+        testWithOutput(new ZstdByteArray(), jarDirectory, "zstd-bytearray");
+
+        System.out.println("Trying Zsd byte array (with dict)");
+        testWithOutput(new ZstdByteArrayDict(zstdDict), jarDirectory, "zstd-bytearray-dict");
+
+        System.out.println("Trying Zsd direct ByteBuffer");
+        testWithOutput(new ZstdDirectByteBuffer(), jarDirectory, "zstd-bytearray");
+
+        System.out.println("Trying Zsd direct ByteBuffer (with dict)");
+        testWithOutput(new ZstdDirectByteBufferDict(zstdDict), jarDirectory, "zstd-bytearray-dict");
     }
 
     private void testWithOutput(ByteTest test, File jarDirectory, String partialFileName) {
