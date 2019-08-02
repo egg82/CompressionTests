@@ -21,23 +21,25 @@ public class LZ4Stream extends BaseByteTest {
 
     private byte[] decompressionBuffer = new byte[1024 * 64];
     protected void decompress(byte[] compressedData) throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
-        try (LZ4BlockInputStream decompressionStream = new LZ4BlockInputStream(inputStream, decompressor)) {
+        try (
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
+                LZ4BlockInputStream decompressionStream = new LZ4BlockInputStream(inputStream, decompressor)
+        ) {
             while (decompressionStream.read(decompressionBuffer) > -1) { }
         }
-        inputStream.close();
     }
 
     public byte[] getDecompressedData(byte[] compressedData) throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(compressedData.length);
-        try (LZ4BlockInputStream decompressionStream = new LZ4BlockInputStream(inputStream, decompressor)) {
+        try (
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
+                LZ4BlockInputStream decompressionStream = new LZ4BlockInputStream(inputStream, decompressor)
+        ) {
             int decompressedBytes;
             while ((decompressedBytes = decompressionStream.read(decompressionBuffer)) > -1) {
                 outputStream.write(decompressionBuffer, 0, decompressedBytes);
             }
         }
-        inputStream.close();
         outputStream.close();
         return outputStream.toByteArray();
     }

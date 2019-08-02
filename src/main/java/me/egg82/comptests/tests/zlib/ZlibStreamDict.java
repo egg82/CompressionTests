@@ -32,41 +32,49 @@ public class ZlibStreamDict extends BaseByteTest {
 
     private byte[] decompressionBuffer = new byte[1024 * 64];
     protected void decompress(byte[] compressedData) throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
-        try (InflaterInputStream decompressionStream = new InflaterInputStream(inputStream)) {
+        try (
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
+                InflaterInputStream decompressionStream = new InflaterInputStream(inputStream, inflater)
+        ) {
             int decompressedBytes;
-            while ((decompressedBytes = decompressionStream.read(decompressionBuffer)) > -1) {
-                if (decompressedBytes == 0) {
+            // This whole mess is needed because while inflater.inflate() returns 0 with needsDictionary and -1 for end-of-stream,
+            // InflaterInputStream.read() returns -1 with needsDictionary and end-of-stream
+            do {
+                decompressedBytes = decompressionStream.read(decompressionBuffer);
+                if (decompressedBytes <= 0) {
                     if (inflater.needsDictionary()) {
                         inflater.setDictionary(dictionary);
-                    } else if (inflater.needsInput()) {
-                        throw new IOException("Inflater reached end of stream prematurely.");
+                    } else {
+                        break;
                     }
                 }
-            }
+            } while (true);
         }
-        inputStream.close();
         inflater.reset();
     }
 
     public byte[] getDecompressedData(byte[] compressedData) throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(compressedData.length);
-        try (InflaterInputStream decompressionStream = new InflaterInputStream(inputStream)) {
+        try (
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
+                InflaterInputStream decompressionStream = new InflaterInputStream(inputStream, inflater)
+        ) {
             int decompressedBytes;
-            while ((decompressedBytes = decompressionStream.read(decompressionBuffer)) > -1) {
-                if (decompressedBytes == 0) {
+            // This whole mess is needed because while inflater.inflate() returns 0 with needsDictionary and -1 for end-of-stream,
+            // InflaterInputStream.read() returns -1 with needsDictionary and end-of-stream
+            do {
+                decompressedBytes = decompressionStream.read(decompressionBuffer);
+                if (decompressedBytes <= 0) {
                     if (inflater.needsDictionary()) {
                         inflater.setDictionary(dictionary);
-                    } else if (inflater.needsInput()) {
-                        throw new IOException("Inflater reached end of stream prematurely.");
+                    } else {
+                        break;
                     }
                 } else {
                     outputStream.write(decompressionBuffer, 0, decompressedBytes);
                 }
-            }
+            } while (true);
         }
-        inputStream.close();
         outputStream.close();
         inflater.reset();
         return outputStream.toByteArray();

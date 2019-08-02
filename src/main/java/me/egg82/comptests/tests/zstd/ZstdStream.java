@@ -19,23 +19,25 @@ public class ZstdStream extends BaseByteTest {
 
     private byte[] decompressionBuffer = new byte[1024 * 64];
     protected void decompress(byte[] compressedData) throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
-        try (ZstdInputStream decompressionStream = new ZstdInputStream(inputStream)) {
+        try (
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
+                ZstdInputStream decompressionStream = new ZstdInputStream(inputStream)
+        ) {
             while (decompressionStream.read(decompressionBuffer) > -1) { }
         }
-        inputStream.close();
     }
 
     public byte[] getDecompressedData(byte[] compressedData) throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(compressedData.length);
-        try (ZstdInputStream decompressionStream = new ZstdInputStream(inputStream)) {
+        try (
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
+                ZstdInputStream decompressionStream = new ZstdInputStream(inputStream)
+        ) {
             int decompressedBytes;
             while ((decompressedBytes = decompressionStream.read(decompressionBuffer)) > -1) {
                 outputStream.write(decompressionBuffer, 0, decompressedBytes);
             }
         }
-        inputStream.close();
         outputStream.close();
         return outputStream.toByteArray();
     }

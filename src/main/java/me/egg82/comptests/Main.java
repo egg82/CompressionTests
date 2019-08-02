@@ -97,6 +97,7 @@ public class Main {
             ex.printStackTrace();
             return;
         }
+        System.out.println();
 
         if (doVerification) {
             System.out.println("Verifying Zlib stream");
