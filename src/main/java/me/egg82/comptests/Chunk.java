@@ -1,9 +1,8 @@
 package me.egg82.comptests;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.zip.DataFormatException;
 import java.util.zip.GZIPInputStream;
@@ -18,10 +17,7 @@ public class Chunk {
 
     private final int hash;
 
-    private final Inflater zlibInflater = new Inflater();
-    private final byte[] decompressionBuffer = new byte[1024 * 64];
-
-    public Chunk(int x, int z, byte compressionType, byte[] compressedData) throws DataFormatException, IOException {
+    public Chunk(int x, int z, byte compressionType, byte[] compressedData) throws IOException {
         this.x = x;
         this.z = z;
 
@@ -59,78 +55,55 @@ public class Chunk {
     public int hashCode() { return hash; }
 
     private byte[] gzipDecompress(byte[] input) throws IOException {
-        byte[] retVal;
-        ByteBuffer outBuf;
-        int power = 1;
-        int totalBytes = 0;
-        do {
-            boolean resize = false;
-            outBuf = ByteBuffer.allocateDirect(1024 * 64 * power);
-
-            try (GZIPInputStream inStream = new GZIPInputStream(new ByteArrayInputStream(input))) {
-                int decompressedBytes;
-                while ((decompressedBytes = inStream.read(decompressionBuffer)) > 0) {
-                    try {
-                        outBuf.put(decompressionBuffer, 0, decompressedBytes);
-                        totalBytes += decompressedBytes;
-                    } catch (BufferOverflowException ignored) {
-                        resize = true;
-                        totalBytes = 0;
-                        break;
-                    }
-                }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(input.length);
+        try (
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(input);
+                GZIPInputStream decompressionStream = new GZIPInputStream(inputStream, 32 * 1024)
+        ) {
+            int decompressedBytes;
+            while ((decompressedBytes = decompressionStream.read(decompressionBuffer)) > -1) {
+                outputStream.write(decompressionBuffer, 0, decompressedBytes);
             }
-
-            if (!resize) {
-                break;
-            }
-            power++;
-        } while (true);
-        retVal = new byte[totalBytes];
-        outBuf.rewind();
-        outBuf.get(retVal);
-        return retVal;
+        }
+        outputStream.close();
+        return outputStream.toByteArray();
     }
 
-    private byte[] inflate(byte[] input) throws DataFormatException, IOException {
-        byte[] retVal;
-        ByteBuffer outBuf;
+    private final Inflater zlibInflater = new Inflater();
+    private final byte[] decompressionBuffer = new byte[1024 * 64];
+    private byte[] inflate(byte[] input) throws IOException {
         int power = 1;
+        byte[] outBuf = new byte[1024 * 64 * power];
         int totalBytes = 0;
-        do {
+
+        zlibInflater.setInput(input, 0, input.length);
+        int decompressedBytes;
+        while (!zlibInflater.finished()) {
             boolean resize = false;
-            outBuf = ByteBuffer.allocateDirect(1024 * 64 * power);
 
-            zlibInflater.setInput(input, 0, input.length);
-            int decompressedBytes;
-            while (!zlibInflater.finished()) {
+            try {
                 decompressedBytes = zlibInflater.inflate(decompressionBuffer);
-                if (decompressedBytes == 0) {
-                    if (zlibInflater.needsDictionary()) {
-                        throw new IOException("Inflater needs dictionary (not vanilla chunks)");
-                    } else if (zlibInflater.needsInput()) {
-                        throw new IOException("Invalid compressed chunk data");
-                    }
-                }
-                try {
-                    outBuf.put(decompressionBuffer, 0, decompressedBytes);
-                    totalBytes += decompressedBytes;
-                } catch (BufferOverflowException ignored) {
-                    resize = true;
-                    totalBytes = 0;
-                    break;
-                }
+            } catch (DataFormatException ex) {
+                throw new IOException("Could not inflate data.", ex);
             }
-            zlibInflater.reset();
 
-            if (!resize) {
-                break;
+            while (decompressedBytes > 1024 * 64 * power - totalBytes) {
+                power++;
+                resize = true;
             }
-            power++;
-        } while (true);
-        retVal = new byte[totalBytes];
-        outBuf.rewind();
-        outBuf.get(retVal);
-        return retVal;
+            if (resize) {
+                byte[] tmp = outBuf;
+                outBuf = new byte[1024 * 64 * power];
+                System.arraycopy(tmp, 0, outBuf, 0, totalBytes);
+            }
+
+            System.arraycopy(decompressionBuffer, 0, outBuf, totalBytes, decompressedBytes);
+            totalBytes += decompressedBytes;
+        }
+        zlibInflater.reset();
+
+        byte[] out = new byte[totalBytes];
+        System.arraycopy(outBuf, 0, out, 0, totalBytes);
+        return out;
     }
 }

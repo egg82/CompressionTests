@@ -65,7 +65,7 @@ public class Main {
             Region region;
             try {
                 region = new Region(regionFiles[i]);
-            } catch (IOException | DataFormatException ex) {
+            } catch (IOException ex) {
                 ex.printStackTrace();
                 continue;
             }

@@ -22,7 +22,7 @@ public class Region {
 
     private final int hash;
 
-    public Region(File regionFile) throws IOException, DataFormatException {
+    public Region(File regionFile) throws IOException {
         int chunkXOffset;
         int chunkZOffset;
 
