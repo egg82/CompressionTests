@@ -21,12 +21,17 @@ public class ZlibDirectByteBufferDict extends BaseByteTest {
 
     private byte[] compressionBuffer = new byte[1024 * 64];
     protected long compress(byte[] decompressedData) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(decompressedData.length);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(decompressedData.length);
         deflater.setInput(decompressedData, 0, decompressedData.length);
         deflater.finish();
         while (!deflater.finished()) {
-            outputStream.write(compressionBuffer, 0, deflater.deflate(compressionBuffer));
+            buffer.put(compressionBuffer, 0, deflater.deflate(compressionBuffer));
         }
+        byte[] out = new byte[buffer.position()];
+        buffer.clear();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(out.length);
+        buffer.get(out);
+        outputStream.write(out);
         outputStream.close();
         deflater.reset();
 
@@ -83,12 +88,17 @@ public class ZlibDirectByteBufferDict extends BaseByteTest {
     }
 
     public byte[] getCompressedData(byte[] decompressedData) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(decompressedData.length);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(decompressedData.length);
         deflater.setInput(decompressedData, 0, decompressedData.length);
         deflater.finish();
         while (!deflater.finished()) {
-            outputStream.write(compressionBuffer, 0, deflater.deflate(compressionBuffer));
+            buffer.put(compressionBuffer, 0, deflater.deflate(compressionBuffer));
         }
+        byte[] out = new byte[buffer.position()];
+        buffer.clear();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(out.length);
+        buffer.get(out);
+        outputStream.write(out);
         outputStream.close();
         deflater.reset();
 

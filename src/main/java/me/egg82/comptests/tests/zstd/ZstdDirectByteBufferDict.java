@@ -7,7 +7,6 @@ import com.github.luben.zstd.ZstdException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.zip.DataFormatException;
 import me.egg82.comptests.tests.generic.BaseByteTest;
 
 public class ZstdDirectByteBufferDict extends BaseByteTest {
@@ -20,9 +19,16 @@ public class ZstdDirectByteBufferDict extends BaseByteTest {
     }
 
     protected long compress(byte[] decompressedData) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream((int) Zstd.compressBound(decompressedData.length));
-        byte[] compressedBytes = Zstd.compress(decompressedData, compressor);
-        outputStream.write(compressedBytes, 0, compressedBytes.length);
+        ByteBuffer buffer = ByteBuffer.allocateDirect((int) Zstd.compressBound(decompressedData.length));
+        ByteBuffer inBuffer = ByteBuffer.allocateDirect(decompressedData.length);
+        inBuffer.put(decompressedData);
+        inBuffer.clear();
+        Zstd.compressDirectByteBufferFastDict(buffer, 0, buffer.remaining(), inBuffer, 0, inBuffer.remaining(), compressor);
+        byte[] out = new byte[buffer.position()];
+        buffer.clear();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(out.length);
+        buffer.get(out);
+        outputStream.write(out);
         outputStream.close();
 
         return outputStream.size();
@@ -61,9 +67,16 @@ public class ZstdDirectByteBufferDict extends BaseByteTest {
     }
 
     public byte[] getCompressedData(byte[] decompressedData) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream((int) Zstd.compressBound(decompressedData.length));
-        byte[] compressedBytes = Zstd.compress(decompressedData, compressor);
-        outputStream.write(compressedBytes, 0, compressedBytes.length);
+        ByteBuffer buffer = ByteBuffer.allocateDirect((int) Zstd.compressBound(decompressedData.length));
+        ByteBuffer inBuffer = ByteBuffer.allocateDirect(decompressedData.length);
+        inBuffer.put(decompressedData);
+        inBuffer.clear();
+        Zstd.compressDirectByteBufferFastDict(buffer, 0, buffer.remaining(), inBuffer, 0, inBuffer.remaining(), compressor);
+        byte[] out = new byte[buffer.position()];
+        buffer.clear();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(out.length);
+        buffer.get(out);
+        outputStream.write(out);
         outputStream.close();
 
         return outputStream.toByteArray();
