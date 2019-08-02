@@ -1,23 +1,15 @@
-package me.egg82.comptests.tests;
+package me.egg82.comptests.tests.zlib;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import me.egg82.comptests.tests.generic.BaseByteTest;
 
-public class ZlibDirectByteBufferDict extends BaseByteTest {
+public class ZlibByteArray extends BaseByteTest {
     private final Inflater inflater = new Inflater();
     private final Deflater deflater = new Deflater();
-
-    private final byte[] dictionary;
-
-    public ZlibDirectByteBufferDict(byte[] dictionary) {
-        this.dictionary = dictionary;
-        deflater.setDictionary(dictionary);
-    }
 
     private byte[] compressionBuffer = new byte[1024 * 64];
     protected long compress(byte[] decompressedData) throws IOException {
@@ -36,7 +28,7 @@ public class ZlibDirectByteBufferDict extends BaseByteTest {
     private byte[] decompressionBuffer = new byte[1024 * 64];
     protected void decompress(byte[] compressedData) throws IOException {
         int power = 1;
-        ByteBuffer outBuf = ByteBuffer.allocateDirect(1024 * 64 * power);
+        byte[] outBuf = new byte[1024 * 64 * power];
         int totalBytes = 0;
 
         inflater.setInput(compressedData, 0, compressedData.length);
@@ -46,15 +38,6 @@ public class ZlibDirectByteBufferDict extends BaseByteTest {
 
             try {
                 decompressedBytes = inflater.inflate(decompressionBuffer);
-                if (decompressedBytes == 0) {
-                    if (inflater.needsDictionary()) {
-                        inflater.setDictionary(dictionary);
-                        decompressedBytes = inflater.inflate(decompressionBuffer);
-                    }
-                    if (inflater.needsInput()) {
-                        throw new IOException("Inflater reached end of stream prematurely.");
-                    }
-                }
             } catch (DataFormatException ex) {
                 throw new IOException("Could not inflate data.", ex);
             }
@@ -64,22 +47,15 @@ public class ZlibDirectByteBufferDict extends BaseByteTest {
                 resize = true;
             }
             if (resize) {
-                ByteBuffer tmp = outBuf;
-                outBuf = ByteBuffer.allocateDirect(1024 * 64 * power);
-                byte[] tmpBytes = new byte[totalBytes];
-                tmp.rewind();
-                tmp.get(tmpBytes);
-                outBuf.put(tmpBytes);
+                byte[] tmp = outBuf;
+                outBuf = new byte[1024 * 64 * power];
+                System.arraycopy(tmp, 0, outBuf, 0, totalBytes);
             }
 
-            outBuf.put(decompressionBuffer, 0, decompressedBytes);
+            System.arraycopy(decompressionBuffer, 0, outBuf, totalBytes, decompressedBytes);
             totalBytes += decompressedBytes;
         }
         inflater.reset();
-
-        byte[] out = new byte[totalBytes];
-        outBuf.rewind();
-        outBuf.get(out);
     }
 
     public byte[] getCompressedData(byte[] decompressedData) throws IOException {

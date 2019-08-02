@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.DataFormatException;
-import me.egg82.comptests.tests.*;
 import me.egg82.comptests.tests.generic.ByteTest;
+import me.egg82.comptests.tests.zlib.*;
 
 public class Main {
     public static void main(String[] args) { new Main(args); }
