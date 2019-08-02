@@ -19,7 +19,7 @@ public class Main {
 
     private Region[] regions = new Region[0];
 
-    private static final DecimalFormat percentFormat = new DecimalFormat("0.###");
+    private static final DecimalFormat percentFormat = new DecimalFormat("0.##");
     private static final DecimalFormat ratioFormat = new DecimalFormat("0.#####");
 
     private boolean doVerification = false;
@@ -72,10 +72,11 @@ public class Main {
             regionList.add(region);
 
             if (i % 5 == 0 || i == regionFiles.length - 1) {
-                System.out.println("Got region " + i + "/" + (regionFiles.length - 1) + " (" + percentFormat.format(((double) i / (double) (regionFiles.length - 1)) * 100.0d) + "%)");
+                System.out.print("Got region " + i + "/" + (regionFiles.length - 1) + " (" + percentFormat.format(((double) i / (double) (regionFiles.length - 1)) * 100.0d) + "%)\r");
             }
         }
         regions = regionList.toArray(new Region[0]);
+        System.out.println();
         System.out.println();
 
         if (doChunkDump) {
@@ -239,9 +240,10 @@ public class Main {
             }
 
             if (i % 5 == 0 || i == regions.length - 1) {
-                System.out.println("Dumped region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)");
+                System.out.print("Dumped region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)\r");
             }
         }
+        System.out.println();
     }
 
     private boolean verify(ByteTest test) {
@@ -254,15 +256,17 @@ public class Main {
                         return false;
                     }
                 } catch (IOException | ZstdException ex) {
+                    System.out.println();
                     ex.printStackTrace();
                     return false;
                 }
             }
 
             if (i % 5 == 0 || i == regions.length - 1) {
-                System.out.println("Verified region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)");
+                System.out.print("Verified region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)\r");
             }
         }
+        System.out.println();
         return true;
     }
 
@@ -314,10 +318,11 @@ public class Main {
             regionDecompressionTime += chunkDecompressionTime / regions[i].getChunks().length;
 
             if (i % 5 == 0 || i == regions.length - 1) {
-                System.out.println("Tested region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)");
+                System.out.print("Tested region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)\r");
             }
         }
 
+        System.out.println();
         System.out.println("Avg. Compression ratio: " + ratioFormat.format(regionRatio / (double) regions.length));
         System.out.println("Avg. Compression time: " + (regionCompressionTime / regions.length) + "us");
         System.out.println("Avg. Decompression time: " + (regionDecompressionTime / regions.length) + "us");
