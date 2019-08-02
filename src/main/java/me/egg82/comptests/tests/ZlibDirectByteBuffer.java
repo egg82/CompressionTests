@@ -2,12 +2,13 @@ package me.egg82.comptests.tests;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import me.egg82.comptests.tests.generic.BaseByteTest;
 
-public class ZlibByteArray extends BaseByteTest {
+public class ZlibDirectByteBuffer extends BaseByteTest {
     private final Inflater inflater = new Inflater();
     private final Deflater deflater = new Deflater();
 
@@ -28,7 +29,7 @@ public class ZlibByteArray extends BaseByteTest {
     private byte[] decompressionBuffer = new byte[1024 * 64];
     protected void decompress(byte[] compressedData) throws IOException {
         int power = 1;
-        byte[] outBuf = new byte[1024 * 64 * power];
+        ByteBuffer outBuf = ByteBuffer.allocateDirect(1024 * 64 * power);
         int totalBytes = 0;
 
         inflater.setInput(compressedData, 0, compressedData.length);
@@ -47,15 +48,22 @@ public class ZlibByteArray extends BaseByteTest {
                 resize = true;
             }
             if (resize) {
-                byte[] tmp = outBuf;
-                outBuf = new byte[1024 * 64 * power];
-                System.arraycopy(tmp, 0, outBuf, 0, totalBytes);
+                ByteBuffer tmp = outBuf;
+                outBuf = ByteBuffer.allocateDirect(1024 * 64 * power);
+                byte[] tmpBytes = new byte[totalBytes];
+                tmp.rewind();
+                tmp.get(tmpBytes);
+                outBuf.put(tmpBytes);
             }
 
-            System.arraycopy(decompressionBuffer, 0, outBuf, totalBytes, decompressedBytes);
+            outBuf.put(decompressionBuffer, 0, decompressedBytes);
             totalBytes += decompressedBytes;
         }
         inflater.reset();
+
+        byte[] out = new byte[totalBytes];
+        outBuf.rewind();
+        outBuf.get(out);
     }
 
     public byte[] getCompressedData(byte[] decompressedData) throws IOException {

@@ -13,6 +13,7 @@ import java.util.zip.DataFormatException;
 import me.egg82.comptests.tests.generic.ByteTest;
 import me.egg82.comptests.tests.ZlibByteArray;
 import me.egg82.comptests.tests.ZlibStream;
+import me.egg82.comptests.tests.ZlibDirectByteBuffer;
 
 public class Main {
     public static void main(String[] args) { new Main(args); }
@@ -77,6 +78,17 @@ public class Main {
                 BufferedWriter decompressionTimeOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-bytearray-decompression-time.txt"), false))
         ) {
             test(new ZlibByteArray(), ratioOutput, compressionTimeOutput, decompressionTimeOutput, System.lineSeparator());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        System.out.println("Trying Zlib direct ByteBuffer");
+        try (
+                BufferedWriter ratioOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-bytebuffer-ratio.txt"), false));
+                BufferedWriter compressionTimeOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-bytebuffer-compression-time.txt"), false));
+                BufferedWriter decompressionTimeOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, "zlib-bytebuffer-decompression-time.txt"), false))
+        ) {
+            test(new ZlibDirectByteBuffer(), ratioOutput, compressionTimeOutput, decompressionTimeOutput, System.lineSeparator());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
