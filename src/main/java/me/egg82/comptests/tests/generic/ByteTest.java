@@ -11,5 +11,6 @@ public interface ByteTest {
     void testCompress(byte[] decompressedData, int iterations) throws IOException;
     void testDecompress(byte[] compressedData, int iterations) throws IOException;
 
+    byte[] getDecompressedData(byte[] compressedData) throws IOException;
     byte[] getCompressedData(byte[] decompressedData) throws IOException;
 }

@@ -46,6 +46,30 @@ public class ZlibStreamDict extends BaseByteTest {
                 }
             }
         }
+        inputStream.close();
+    }
+
+    public byte[] getDecompressedData(byte[] compressedData) throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedData);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(compressedData.length);
+        try (InflaterInputStream decompressionStream = new InflaterInputStream(inputStream)) {
+            int decompressedBytes;
+            while ((decompressedBytes = decompressionStream.read(decompressionBuffer)) > -1) {
+                if (decompressedBytes == 0) {
+                    if (inflater.needsDictionary()) {
+                        inflater.setDictionary(dictionary);
+                    }
+                    if (inflater.needsInput()) {
+                        throw new IOException("Inflater reached end of stream prematurely.");
+                    }
+                } else {
+                    outputStream.write(decompressionBuffer, 0, decompressedBytes);
+                }
+            }
+        }
+        inputStream.close();
+        outputStream.close();
+        return outputStream.toByteArray();
     }
 
     public byte[] getCompressedData(byte[] decompressedData) throws IOException {

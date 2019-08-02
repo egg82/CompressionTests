@@ -1,9 +1,6 @@
 package me.egg82.comptests.tests.zstd;
 
-import com.github.luben.zstd.Zstd;
-import com.github.luben.zstd.ZstdDictCompress;
-import com.github.luben.zstd.ZstdDictDecompress;
-import com.github.luben.zstd.ZstdException;
+import com.github.luben.zstd.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import me.egg82.comptests.tests.generic.BaseByteTest;
@@ -56,6 +53,35 @@ public class ZstdByteArrayDict extends BaseByteTest {
 
         byte[] out = new byte[(int) decompressedBytes];
         System.arraycopy(outBuf, 0, out, 0, (int) decompressedBytes);
+    }
+
+    public byte[] getDecompressedData(byte[] compressedData) {
+        int power = 1;
+        byte[] outBuf;
+
+        long decompressedBytes;
+        boolean resize;
+        do {
+            resize = false;
+            outBuf = new byte[1024 * 64 * power];
+
+            decompressedBytes = Zstd.decompressFastDict(outBuf, 0, compressedData, 0, compressedData.length, decompressor);
+            if (Zstd.isError(decompressedBytes)) {
+                if (Zstd.getErrorCode(decompressedBytes) == Zstd.errDstSizeTooSmall()) {
+                    resize = true;
+                } else {
+                    throw new ZstdException(decompressedBytes);
+                }
+            }
+
+            if (resize) {
+                power++;
+            }
+        } while (resize);
+
+        byte[] out = new byte[(int) decompressedBytes];
+        System.arraycopy(outBuf, 0, out, 0, (int) decompressedBytes);
+        return out;
     }
 
     public byte[] getCompressedData(byte[] decompressedData) throws IOException {

@@ -44,6 +44,35 @@ public class ZstdByteArray extends BaseByteTest {
         System.arraycopy(outBuf, 0, out, 0, (int) decompressedBytes);
     }
 
+    public byte[] getDecompressedData(byte[] compressedData) {
+        int power = 1;
+        byte[] outBuf;
+
+        long decompressedBytes;
+        boolean resize;
+        do {
+            resize = false;
+            outBuf = new byte[1024 * 64 * power];
+
+            decompressedBytes = Zstd.decompress(outBuf, compressedData);
+            if (Zstd.isError(decompressedBytes)) {
+                if (Zstd.getErrorCode(decompressedBytes) == Zstd.errDstSizeTooSmall()) {
+                    resize = true;
+                } else {
+                    throw new ZstdException(decompressedBytes);
+                }
+            }
+
+            if (resize) {
+                power++;
+            }
+        } while (resize);
+
+        byte[] out = new byte[(int) decompressedBytes];
+        System.arraycopy(outBuf, 0, out, 0, (int) decompressedBytes);
+        return out;
+    }
+
     public byte[] getCompressedData(byte[] decompressedData) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream((int) Zstd.compressBound(decompressedData.length));
         byte[] compressedBytes = Zstd.compress(decompressedData, 1);
