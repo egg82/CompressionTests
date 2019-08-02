@@ -23,6 +23,7 @@ public class Main {
     private static final DecimalFormat ratioFormat = new DecimalFormat("0.#####");
 
     private boolean doVerification = false;
+    private boolean doChunkDump = false;
 
     private Main(String[] args) {
         if (args.length == 0) {
@@ -44,23 +45,15 @@ public class Main {
             if (contains(flags, "--verify")) {
                 doVerification = true;
             }
+            if (contains(flags, "--dump")) {
+                doChunkDump = true;
+            }
         }
 
         File jarDirectory;
         try {
             jarDirectory = getJarDirectory();
         } catch (URISyntaxException ex) {
-            ex.printStackTrace();
-            return;
-        }
-
-        System.out.println("Getting dictionaries..");
-        byte[] zlibDict;
-        byte[] zstdDict;
-        try {
-            zlibDict = toBytes(getClass().getClassLoader().getResourceAsStream("paper.zlib.dict"));
-            zstdDict = toBytes(getClass().getClassLoader().getResourceAsStream("paper.zstd.dict"));
-        } catch (IOException ex) {
             ex.printStackTrace();
             return;
         }
@@ -84,6 +77,25 @@ public class Main {
         }
         regions = regionList.toArray(new Region[0]);
         System.out.println();
+
+        if (doChunkDump) {
+            System.out.println("Dumping raw chunks..");
+            File rawChunksDir = new File(regionDir, "rawchunks");
+            rawChunksDir.mkdirs();
+            dump(rawChunksDir);
+            return;
+        }
+
+        System.out.println("Getting dictionaries..");
+        byte[] zlibDict;
+        byte[] zstdDict;
+        try {
+            zlibDict = toBytes(getClass().getClassLoader().getResourceAsStream("paper.zlib.dict"));
+            zstdDict = toBytes(getClass().getClassLoader().getResourceAsStream("paper.zstd.dict"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return;
+        }
 
         System.out.println("Verifying Zlib stream");
         if (!doVerification || verify(new ZlibStream())) {
@@ -213,6 +225,22 @@ public class Main {
         } else {
             System.err.println("Verification failed!");
             System.out.println();
+        }
+    }
+
+    private void dump(File chunksDir) {
+        for (int i = 0; i < regions.length; i++) {
+            for (Chunk chunk : regions[i].getChunks()) {
+                try (FileOutputStream outputStream = new FileOutputStream(new File(chunksDir, "chunk." + chunk.getX() + "." + chunk.getZ() + ".taco"))) {
+                    outputStream.write(chunk.getUncompressedData());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            if (i % 5 == 0 || i == regions.length - 1) {
+                System.out.println("Dumped region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)");
+            }
         }
     }
 

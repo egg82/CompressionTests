@@ -59,8 +59,7 @@ public class ZlibStreamDict extends BaseByteTest {
                 if (decompressedBytes == 0) {
                     if (inflater.needsDictionary()) {
                         inflater.setDictionary(dictionary);
-                    }
-                    if (inflater.needsInput()) {
+                    } else if (inflater.needsInput()) {
                         throw new IOException("Inflater reached end of stream prematurely.");
                     }
                 } else {
