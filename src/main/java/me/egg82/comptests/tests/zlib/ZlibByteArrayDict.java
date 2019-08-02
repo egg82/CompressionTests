@@ -47,8 +47,7 @@ public class ZlibByteArrayDict extends BaseByteTest {
                     if (inflater.needsDictionary()) {
                         inflater.setDictionary(dictionary);
                         decompressedBytes = inflater.inflate(decompressionBuffer);
-                    }
-                    if (inflater.needsInput()) {
+                    } else if (inflater.needsInput()) {
                         throw new IOException("Inflater reached end of stream prematurely.");
                     }
                 }
