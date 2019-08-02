@@ -87,6 +87,7 @@ public class Main {
 
         System.out.println("Verifying Zlib stream");
         if (!doVerification || verify(new ZlibStream())) {
+            System.out.println();
             System.out.println("Trying Zlib stream");
             testWithOutput(new ZlibStream(), jarDirectory, "zlib-stream");
         } else {
@@ -95,6 +96,7 @@ public class Main {
 
         System.out.println("Verifying Zlib stream (with dictionary)");
         if (!doVerification || verify(new ZlibStreamDict(zlibDict))) {
+            System.out.println();
             System.out.println("Trying Zlib stream (with dictionary)");
             testWithOutput(new ZlibStreamDict(zlibDict), jarDirectory, "zlib-stream-dict");
         } else {
@@ -103,6 +105,7 @@ public class Main {
 
         System.out.println("Verifying Zlib byte array");
         if (!doVerification || verify(new ZlibByteArray())) {
+            System.out.println();
             System.out.println("Trying Zlib byte array");
             testWithOutput(new ZlibByteArray(), jarDirectory, "zlib-bytearray");
         } else {
@@ -111,6 +114,7 @@ public class Main {
 
         System.out.println("Verifying Zlib byte array (with dict)");
         if (!doVerification || verify(new ZlibByteArrayDict(zlibDict))) {
+            System.out.println();
             System.out.println("Trying Zlib byte array (with dict)");
             testWithOutput(new ZlibByteArrayDict(zlibDict), jarDirectory, "zlib-bytearray-dict");
         } else {
@@ -119,6 +123,7 @@ public class Main {
 
         System.out.println("Verifying Zlib direct ByteBuffer");
         if (!doVerification || verify(new ZlibDirectByteBuffer())) {
+            System.out.println();
             System.out.println("Trying Zlib direct ByteBuffer");
             testWithOutput(new ZlibDirectByteBuffer(), jarDirectory, "zlib-bytebuffer");
         } else {
@@ -127,6 +132,7 @@ public class Main {
 
         System.out.println("Verifying Zlib direct ByteBuffer (with dict)");
         if (!doVerification || verify(new ZlibDirectByteBufferDict(zlibDict))) {
+            System.out.println();
             System.out.println("Trying Zlib direct ByteBuffer (with dict)");
             testWithOutput(new ZlibDirectByteBufferDict(zlibDict), jarDirectory, "zlib-bytebuffer-dict");
         } else {
@@ -135,6 +141,7 @@ public class Main {
 
         System.out.println("Verifying LZ4 stream");
         if (!doVerification || verify(new LZ4Stream())) {
+            System.out.println();
             System.out.println("Trying LZ4 stream");
             testWithOutput(new LZ4Stream(), jarDirectory, "lz4-stream");
         } else {
@@ -143,6 +150,7 @@ public class Main {
 
         System.out.println("Verifying Zstd stream");
         if (!doVerification || verify(new ZstdStream())) {
+            System.out.println();
             System.out.println("Trying Zstd stream");
             testWithOutput(new ZstdStream(), jarDirectory, "zstd-stream");
         } else {
