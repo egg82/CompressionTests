@@ -72,7 +72,7 @@ public class Main {
             regionList.add(region);
 
             if (i % 5 == 0 || i == regionFiles.length - 1) {
-                System.out.print("Got region " + i + "/" + (regionFiles.length - 1) + " (" + percentFormat.format(((double) i / (double) (regionFiles.length - 1)) * 100.0d) + "%)\r");
+                System.out.print("Got region " + i + "/" + (regionFiles.length - 1) + " (" + percentFormat.format(((double) i / (double) (regionFiles.length - 1)) * 100.0d) + "%)   \r");
             }
         }
         regions = regionList.toArray(new Region[0]);
@@ -240,7 +240,7 @@ public class Main {
             }
 
             if (i % 5 == 0 || i == regions.length - 1) {
-                System.out.print("Dumped region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)\r");
+                System.out.print("Dumped region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)   \r");
             }
         }
         System.out.println();
@@ -263,7 +263,7 @@ public class Main {
             }
 
             if (i % 5 == 0 || i == regions.length - 1) {
-                System.out.print("Verified region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)\r");
+                System.out.print("Verified region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)   \r");
             }
         }
         System.out.println();
@@ -318,7 +318,7 @@ public class Main {
             regionDecompressionTime += chunkDecompressionTime / regions[i].getChunks().length;
 
             if (i % 5 == 0 || i == regions.length - 1) {
-                System.out.print("Tested region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)\r");
+                System.out.print("Tested region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)   \r");
             }
         }
 
