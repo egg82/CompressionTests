@@ -54,15 +54,19 @@ public class Main {
 
         System.out.println("Getting region files and decompressing chunks..");
         List<Region> regionList = new ArrayList<>();
-        for (File regionFile : regionFiles) {
+        for (int i = 0; i < regionFiles.length; i++) {
             Region region;
             try {
-                region = new Region(regionFile);
+                region = new Region(regionFiles[i]);
             } catch (IOException | DataFormatException ex) {
                 ex.printStackTrace();
                 continue;
             }
             regionList.add(region);
+
+            if (i % 5 == 0 || i == regionFiles.length - 1) {
+                System.out.println("Got region " + i + "/" + (regionFiles.length - 1) + " (" + percentFormat.format(((double) i / (double) (regionFiles.length - 1)) * 100.0d) + "%)");
+            }
         }
         regions = regionList.toArray(new Region[0]);
 
