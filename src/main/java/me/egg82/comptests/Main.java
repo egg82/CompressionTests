@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.DataFormatException;
 import me.egg82.comptests.tests.generic.ByteTest;
+import me.egg82.comptests.tests.lz4.LZ4Stream;
 import me.egg82.comptests.tests.zlib.*;
 
 public class Main {
@@ -52,6 +53,7 @@ public class Main {
             return;
         }
 
+        System.out.println();
         System.out.println("Getting region files and decompressing chunks..");
         List<Region> regionList = new ArrayList<>();
         for (int i = 0; i < regionFiles.length; i++) {
@@ -69,6 +71,7 @@ public class Main {
             }
         }
         regions = regionList.toArray(new Region[0]);
+        System.out.println();
 
         System.out.println("Trying Zlib stream");
         testWithOutput(new ZlibStream(), jarDirectory, "zlib-stream");
@@ -87,6 +90,9 @@ public class Main {
 
         System.out.println("Trying Zlib direct ByteBuffer (with dict)");
         testWithOutput(new ZlibDirectByteBufferDict(zlibDict), jarDirectory, "zlib-bytebuffer-dict");
+
+        System.out.println("Trying LZ4 stream");
+        testWithOutput(new LZ4Stream(), jarDirectory, "lz4-stream");
     }
 
     private void testWithOutput(ByteTest test, File jarDirectory, String partialFileName) {
