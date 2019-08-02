@@ -179,10 +179,10 @@ public class Main {
         testWithOutput(new ZstdByteArrayDict(zstdDict), jarDirectory, "zstd-bytearray-dict");
 
         System.out.println("Trying Zstd direct ByteBuffer");
-        testWithOutput(new ZstdDirectByteBuffer(), jarDirectory, "zstd-bytearray");
+        testWithOutput(new ZstdDirectByteBuffer(), jarDirectory, "zstd-bytebuffer");
 
         System.out.println("Trying Zstd direct ByteBuffer (with dict)");
-        testWithOutput(new ZstdDirectByteBufferDict(zstdDict), jarDirectory, "zstd-bytearray-dict");
+        testWithOutput(new ZstdDirectByteBufferDict(zstdDict), jarDirectory, "zstd-bytebuffer-dict");
     }
 
     private void dump(File chunksDir) {
