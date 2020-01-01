@@ -23,12 +23,12 @@ public class Chunk {
 
         this.compressionType = compressionType;
 
-        if (compressionType == 0) {
-            this.uncompressedData = compressedData;
-        } else if (compressionType == 1) {
+        if (compressionType == 1) {
             this.uncompressedData = gzipDecompress(compressedData);
         } else if (compressionType == 2) {
             this.uncompressedData = inflate(compressedData);
+        } else if (compressionType == 3) {
+            this.uncompressedData = compressedData;
         } else {
             this.uncompressedData = null;
         }
