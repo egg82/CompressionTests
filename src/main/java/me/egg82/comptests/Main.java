@@ -1,5 +1,6 @@
 package me.egg82.comptests;
 
+import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdException;
 import java.io.*;
 import java.net.URISyntaxException;
@@ -8,7 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+
 import me.egg82.comptests.tests.generic.ByteTest;
 import me.egg82.comptests.tests.lz4.LZ4Stream;
 import me.egg82.comptests.tests.zlib.*;
@@ -24,6 +26,10 @@ public class Main {
 
     private boolean doVerification = false;
     private boolean doChunkDump = false;
+    private boolean doLevels = false;
+
+    private int defaultZlibLevel = Deflater.DEFAULT_COMPRESSION;
+    private int defaultZstdLevel = 1;
 
     private Main(String[] args) {
         if (args.length == 0) {
@@ -47,6 +53,9 @@ public class Main {
             }
             if (contains(flags, "--dump")) {
                 doChunkDump = true;
+            }
+            if (contains(flags, "--levels")) {
+                doLevels = true;
             }
         }
 
@@ -99,90 +108,119 @@ public class Main {
         }
         System.out.println();
 
+        if (doLevels) {
+            System.out.println("Testing Zlib stream levels");
+            System.out.println();
+            for (int i = Deflater.BEST_SPEED; i <= Deflater.BEST_COMPRESSION; i++) {
+                System.out.println("Level " + i);
+                levelWithOutput(new ZlibStream(i), jarDirectory, "zlib-stream-level-" + i);
+            }
+
+            System.out.println("Testing Zlib stream levels (with dictionary)");
+            System.out.println();
+            for (int i = Deflater.BEST_SPEED; i <= Deflater.BEST_COMPRESSION; i++) {
+                System.out.println("Level " + i);
+                levelWithOutput(new ZlibStreamDict(zlibDict, i), jarDirectory, "zlib-stream-dict-level-" + i);
+            }
+
+            System.out.println("Testing Zstd stream levels");
+            System.out.println();
+            for (int i = -1; i <= 13; i++) {
+                System.out.println("Level " + i);
+                levelWithOutput(new ZstdStream(i), jarDirectory, "zstd-stream-level-" + i);
+            }
+
+            System.out.println("Testing Zstd stream levels (with dict)");
+            System.out.println();
+            for (int i = -1; i <= Zstd.maxCompressionLevel(); i++) {
+                System.out.println("Level " + i);
+                levelWithOutput(new ZstdStreamDict(zstdDict, i), jarDirectory, "zstd-stream-dict-level-" + i);
+            }
+
+            return;
+        }
+
         if (doVerification) {
             System.out.println("Verifying Zlib stream");
-            verify(new ZlibStream());
+            verify(new ZlibStream(defaultZlibLevel));
 
-            System.out.println("Verifying Zlib stream (with dictionary)");
-            verify(new ZlibStreamDict(zlibDict));
+            System.out.println("Verifying Zlib stream (with dict)");
+            verify(new ZlibStreamDict(zlibDict, defaultZlibLevel));
 
             System.out.println("Verifying Zlib byte array");
-            verify(new ZlibByteArray());
+            verify(new ZlibByteArray(defaultZlibLevel));
 
             System.out.println("Verifying Zlib byte array (with dict)");
-            verify(new ZlibByteArrayDict(zlibDict));
-
-            System.out.println("Verifying Zlib byte array (with dict)");
-            verify(new ZlibByteArrayDict(zlibDict));
+            verify(new ZlibByteArrayDict(zlibDict, defaultZlibLevel));
 
             System.out.println("Verifying Zlib direct ByteBuffer");
-            verify(new ZlibDirectByteBuffer());
+            verify(new ZlibDirectByteBuffer(defaultZlibLevel));
 
             System.out.println("Verifying Zlib direct ByteBuffer (with dict)");
-            verify(new ZlibDirectByteBufferDict(zlibDict));
+            verify(new ZlibDirectByteBufferDict(zlibDict, defaultZlibLevel));
 
             System.out.println("Verifying LZ4 stream");
             verify(new LZ4Stream());
 
             System.out.println("Verifying Zstd stream");
-            verify(new ZstdStream());
+            verify(new ZstdStream(defaultZstdLevel));
 
             System.out.println("Verifying Zstd stream (with dict)");
-            verify(new ZstdStreamDict(zstdDict));
+            verify(new ZstdStreamDict(zstdDict, defaultZstdLevel));
 
             System.out.println("Verifying Zstd byte array");
-            verify(new ZstdByteArray());
+            verify(new ZstdByteArray(defaultZstdLevel));
 
             System.out.println("Verifying Zstd byte array (with dict)");
-            verify(new ZstdByteArrayDict(zstdDict));
+            verify(new ZstdByteArrayDict(zstdDict, defaultZstdLevel));
 
             System.out.println("Verifying Zstd direct ByteBuffer");
-            verify(new ZstdDirectByteBuffer());
+            verify(new ZstdDirectByteBuffer(defaultZstdLevel));
 
             System.out.println("Verifying Zstd direct ByteBuffer (with dict)");
-            verify(new ZstdDirectByteBufferDict(zstdDict));
+            verify(new ZstdDirectByteBufferDict(zstdDict, defaultZstdLevel));
 
             return;
         }
 
         System.out.println("Trying Zlib stream");
-        testWithOutput(new ZlibStream(), jarDirectory, "zlib-stream");
+        testWithOutput(new ZlibStream(defaultZlibLevel), jarDirectory, "zlib-stream");
 
-        System.out.println("Trying Zlib stream (with dictionary)");
-        testWithOutput(new ZlibStreamDict(zlibDict), jarDirectory, "zlib-stream-dict");
+        System.out.println("Trying Zlib stream (with dict)");
+        testWithOutput(new ZlibStreamDict(zlibDict, defaultZlibLevel), jarDirectory, "zlib-stream-dict");
 
         System.out.println("Trying Zlib byte array");
-        testWithOutput(new ZlibByteArray(), jarDirectory, "zlib-bytearray");
+        testWithOutput(new ZlibByteArray(defaultZlibLevel), jarDirectory, "zlib-bytearray");
 
         System.out.println("Trying Zlib byte array (with dict)");
-        testWithOutput(new ZlibByteArrayDict(zlibDict), jarDirectory, "zlib-bytearray-dict");
+        testWithOutput(new ZlibByteArrayDict(zlibDict, defaultZlibLevel), jarDirectory, "zlib-bytearray-dict");
 
         System.out.println("Trying Zlib direct ByteBuffer");
-        testWithOutput(new ZlibDirectByteBuffer(), jarDirectory, "zlib-bytebuffer");
+        testWithOutput(new ZlibDirectByteBuffer(defaultZlibLevel), jarDirectory, "zlib-bytebuffer");
 
         System.out.println("Trying Zlib direct ByteBuffer (with dict)");
-        testWithOutput(new ZlibDirectByteBufferDict(zlibDict), jarDirectory, "zlib-bytebuffer-dict");
+        testWithOutput(new ZlibDirectByteBufferDict(zlibDict, defaultZlibLevel), jarDirectory, "zlib-bytebuffer-dict");
 
         System.out.println("Trying LZ4 stream");
         testWithOutput(new LZ4Stream(), jarDirectory, "lz4-stream");
 
         System.out.println("Trying Zstd stream");
-        testWithOutput(new ZstdStream(), jarDirectory, "zstd-stream");
+        testWithOutput(new ZstdStream(defaultZstdLevel), jarDirectory, "zstd-stream");
 
         System.out.println("Trying Zstd stream (with dict)");
-        testWithOutput(new ZstdStreamDict(zstdDict), jarDirectory, "zstd-stream-dict");
+        testWithOutput(new ZstdStreamDict(zstdDict, defaultZstdLevel), jarDirectory, "zstd-stream-dict");
 
         System.out.println("Trying Zstd byte array");
-        testWithOutput(new ZstdByteArray(), jarDirectory, "zstd-bytearray");
+        testWithOutput(new ZstdByteArray(defaultZstdLevel), jarDirectory, "zstd-bytearray");
 
         System.out.println("Trying Zstd byte array (with dict)");
-        testWithOutput(new ZstdByteArrayDict(zstdDict), jarDirectory, "zstd-bytearray-dict");
+        testWithOutput(new ZstdByteArrayDict(zstdDict, defaultZstdLevel), jarDirectory, "zstd-bytearray-dict");
 
         System.out.println("Trying Zstd direct ByteBuffer");
-        testWithOutput(new ZstdDirectByteBuffer(), jarDirectory, "zstd-bytebuffer");
+        testWithOutput(new ZstdDirectByteBuffer(defaultZstdLevel), jarDirectory, "zstd-bytebuffer");
 
         System.out.println("Trying Zstd direct ByteBuffer (with dict)");
-        testWithOutput(new ZstdDirectByteBufferDict(zstdDict), jarDirectory, "zstd-bytebuffer-dict");
+        testWithOutput(new ZstdDirectByteBufferDict(zstdDict, defaultZstdLevel), jarDirectory, "zstd-bytebuffer-dict");
     }
 
     private void dump(File chunksDir) {
@@ -288,6 +326,68 @@ public class Main {
         System.out.println("Avg. Compression time: " + (regionCompressionTime / regions.length) + "us");
         System.out.println("Avg. Decompression time: " + (regionDecompressionTime / regions.length) + "us");
         System.out.println();
+
+        System.gc();
+    }
+
+    private void levelWithOutput(ByteTest test, File jarDirectory, String partialFileName) {
+        try (
+                BufferedWriter ratioOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, partialFileName + "-ratio.txt"), false));
+                BufferedWriter compressionTimeOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, partialFileName + "-compression-time.txt"), false));
+                BufferedWriter decompressionTimeOutput = new BufferedWriter(new FileWriter(new File(jarDirectory, partialFileName + "-decompression-time.txt"), false))
+        ) {
+            level(test, ratioOutput, compressionTimeOutput, decompressionTimeOutput, System.lineSeparator());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void level(ByteTest test, BufferedWriter ratioOutput, BufferedWriter compressionTimeOutput, BufferedWriter decompressionTimeOutput, String lineEnding) {
+        double regionRatio = 0.0d;
+        long regionCompressionTime = 0L;
+        long regionDecompressionTime = 0L;
+
+        for (int i = 0; i < regions.length; i++) {
+            double chunkRatio = 0.0d;
+            long chunkCompressionTime = 0L;
+            long chunkDecompressionTime = 0L;
+
+            for (Chunk chunk : regions[i].getChunks()) {
+                try {
+                    test.testCompress(chunk.getUncompressedData(), 3);
+                    test.testDecompress(test.getCompressedData(chunk.getUncompressedData()), 3);
+                    if (test.getCompressionRatio() != -1.0d) {
+                        chunkRatio += test.getCompressionRatio();
+                        ratioOutput.write(test.getCompressionRatio() + lineEnding);
+                    }
+                    if (test.getCompressionTime(TimeUnit.NANOSECONDS) != -1L) {
+                        chunkCompressionTime += test.getCompressionTime(TimeUnit.MICROSECONDS);
+                        compressionTimeOutput.write(test.getCompressionTime(TimeUnit.MICROSECONDS) + lineEnding);
+                    }
+                    if (test.getDecompressionTime(TimeUnit.NANOSECONDS) != -1L) {
+                        chunkDecompressionTime += test.getDecompressionTime(TimeUnit.MICROSECONDS);
+                        decompressionTimeOutput.write(test.getDecompressionTime(TimeUnit.MICROSECONDS) + lineEnding);
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            regionRatio += chunkRatio / (double) regions[i].getChunks().length;
+            regionCompressionTime += chunkCompressionTime / regions[i].getChunks().length;
+            regionDecompressionTime += chunkDecompressionTime / regions[i].getChunks().length;
+
+            if (i % 5 == 0 || i == regions.length - 1) {
+                System.out.print("Tested region " + i + "/" + (regions.length - 1) + " (" + percentFormat.format(((double) i / (double) (regions.length - 1)) * 100.0d) + "%)   \r");
+            }
+        }
+
+        System.out.println("Avg. Compression ratio: " + ratioFormat.format(regionRatio / (double) regions.length));
+        System.out.println("Avg. Compression time: " + (regionCompressionTime / regions.length) + "us");
+        System.out.println("Avg. Decompression time: " + (regionDecompressionTime / regions.length) + "us");
+        System.out.println();
+
+        System.gc();
     }
 
     private File getJarDirectory() throws URISyntaxException {

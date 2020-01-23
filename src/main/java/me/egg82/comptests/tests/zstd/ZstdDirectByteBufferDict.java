@@ -10,8 +10,8 @@ public class ZstdDirectByteBufferDict extends BaseByteTest {
     private final ZstdDictCompress compressor;
     private final ZstdDictDecompress decompressor;
 
-    public ZstdDirectByteBufferDict(byte[] dictionary) {
-        compressor = new ZstdDictCompress(dictionary, 1);
+    public ZstdDirectByteBufferDict(byte[] dictionary, int level) {
+        compressor = new ZstdDictCompress(dictionary, level);
         decompressor = new ZstdDictDecompress(dictionary);
     }
 

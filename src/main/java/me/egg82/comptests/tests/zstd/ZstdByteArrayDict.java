@@ -9,8 +9,8 @@ public class ZstdByteArrayDict extends BaseByteTest {
     private final ZstdDictCompress compressor;
     private final ZstdDictDecompress decompressor;
 
-    public ZstdByteArrayDict(byte[] dictionary) {
-        compressor = new ZstdDictCompress(dictionary, 1);
+    public ZstdByteArrayDict(byte[] dictionary, int level) {
+        compressor = new ZstdDictCompress(dictionary, level);
         decompressor = new ZstdDictDecompress(dictionary);
     }
 

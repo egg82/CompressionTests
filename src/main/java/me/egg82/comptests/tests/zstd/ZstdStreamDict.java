@@ -13,8 +13,8 @@ public class ZstdStreamDict extends BaseByteTest {
     private final ZstdDictCompress compressor;
     private final ZstdDictDecompress decompressor;
 
-    public ZstdStreamDict(byte[] dictionary) {
-        compressor = new ZstdDictCompress(dictionary, 1);
+    public ZstdStreamDict(byte[] dictionary, int level) {
+        compressor = new ZstdDictCompress(dictionary, level);
         decompressor = new ZstdDictDecompress(dictionary);
     }
 

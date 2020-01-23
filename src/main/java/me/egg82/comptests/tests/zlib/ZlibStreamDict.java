@@ -10,13 +10,14 @@ import java.util.zip.InflaterInputStream;
 import me.egg82.comptests.tests.generic.BaseByteTest;
 
 public class ZlibStreamDict extends BaseByteTest {
-    private final Deflater deflater = new Deflater();
+    private final Deflater deflater;
     private final Inflater inflater = new Inflater();
 
     private final byte[] dictionary;
 
-    public ZlibStreamDict(byte[] dictionary) {
+    public ZlibStreamDict(byte[] dictionary, int level) {
         this.dictionary = dictionary;
+        deflater = new Deflater(level);
         deflater.setDictionary(dictionary);
     }
 

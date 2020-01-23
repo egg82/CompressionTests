@@ -8,12 +8,13 @@ import me.egg82.comptests.tests.generic.BaseByteTest;
 
 public class ZlibDirectByteBufferDict extends BaseByteTest {
     private final Inflater inflater = new Inflater();
-    private final Deflater deflater = new Deflater();
+    private final Deflater deflater;
 
     private final byte[] dictionary;
 
-    public ZlibDirectByteBufferDict(byte[] dictionary) {
+    public ZlibDirectByteBufferDict(byte[] dictionary, int level) {
         this.dictionary = dictionary;
+        deflater = new Deflater(level);
         deflater.setDictionary(dictionary);
     }
 

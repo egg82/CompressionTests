@@ -8,12 +8,16 @@ import java.nio.ByteBuffer;
 import me.egg82.comptests.tests.generic.BaseByteTest;
 
 public class ZstdDirectByteBuffer extends BaseByteTest {
+    private final int level;
+
+    public ZstdDirectByteBuffer(int level) { this.level = level; }
+
     protected long compress(byte[] decompressedData) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocateDirect((int) Zstd.compressBound(decompressedData.length));
         ByteBuffer inBuffer = ByteBuffer.allocateDirect(decompressedData.length);
         inBuffer.put(decompressedData);
         inBuffer.clear();
-        long compressedBytes = Zstd.compressDirectByteBuffer(buffer, 0, buffer.remaining(), inBuffer, 0, inBuffer.remaining(), 1);
+        long compressedBytes = Zstd.compressDirectByteBuffer(buffer, 0, buffer.remaining(), inBuffer, 0, inBuffer.remaining(), level);
         if (Zstd.isError(compressedBytes)) {
             throw new ZstdException(compressedBytes);
         }
@@ -97,7 +101,7 @@ public class ZstdDirectByteBuffer extends BaseByteTest {
         ByteBuffer inBuffer = ByteBuffer.allocateDirect(decompressedData.length);
         inBuffer.put(decompressedData);
         inBuffer.clear();
-        long compressedBytes = Zstd.compressDirectByteBuffer(buffer, 0, buffer.remaining(), inBuffer, 0, inBuffer.remaining(), 1);
+        long compressedBytes = Zstd.compressDirectByteBuffer(buffer, 0, buffer.remaining(), inBuffer, 0, inBuffer.remaining(), level);
         if (Zstd.isError(compressedBytes)) {
             throw new ZstdException(compressedBytes);
         }

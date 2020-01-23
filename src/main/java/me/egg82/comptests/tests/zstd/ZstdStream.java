@@ -8,9 +8,13 @@ import java.io.IOException;
 import me.egg82.comptests.tests.generic.BaseByteTest;
 
 public class ZstdStream extends BaseByteTest {
+    private final int level;
+
+    public ZstdStream(int level) { this.level = level; }
+
     protected long compress(byte[] decompressedData) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(decompressedData.length);
-        try (ZstdOutputStream compressionStream = new ZstdOutputStream(outputStream, 1)) {
+        try (ZstdOutputStream compressionStream = new ZstdOutputStream(outputStream, level)) {
             compressionStream.write(decompressedData);
         }
         outputStream.close();
@@ -44,7 +48,7 @@ public class ZstdStream extends BaseByteTest {
 
     public byte[] getCompressedData(byte[] decompressedData) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(decompressedData.length);
-        try (ZstdOutputStream compressionStream = new ZstdOutputStream(outputStream, 1)) {
+        try (ZstdOutputStream compressionStream = new ZstdOutputStream(outputStream, level)) {
             compressionStream.write(decompressedData);
         }
         outputStream.close();

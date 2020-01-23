@@ -7,7 +7,9 @@ import me.egg82.comptests.tests.generic.BaseByteTest;
 
 public class ZlibByteArray extends BaseByteTest {
     private final Inflater inflater = new Inflater();
-    private final Deflater deflater = new Deflater();
+    private final Deflater deflater;
+
+    public ZlibByteArray(int level) { deflater = new Deflater(level); }
 
     private byte[] compressionBuffer = new byte[1024 * 64];
     protected long compress(byte[] decompressedData) throws IOException {
