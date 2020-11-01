@@ -67,6 +67,29 @@ public class Main {
             return;
         }
 
+        if (doChunkDump && !doVerification && !doLevels) {
+            System.out.println();
+            System.out.println("Dumping raw chunks..");
+            File rawChunksDir = new File(regionDir, "rawchunks");
+            rawChunksDir.mkdirs();
+            for (int i = 0; i < regionFiles.length; i++) {
+                Region region;
+                try {
+                    region = new Region(regionFiles[i]);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    continue;
+                }
+                dump(region, rawChunksDir);
+
+                if (i % 5 == 0 || i == regionFiles.length - 1) {
+                    System.out.print("Dumped region " + i + "/" + (regionFiles.length - 1) + " (" + percentFormat.format(((double) i / (double) (regionFiles.length - 1)) * 100.0d) + "%)   \r");
+                }
+            }
+            System.out.println();
+            return;
+        }
+
         System.out.println();
         System.out.println("Getting region files and decompressing chunks..");
         List<Region> regionList = new ArrayList<>();
@@ -238,6 +261,16 @@ public class Main {
             }
         }
         System.out.println();
+    }
+
+    private void dump(Region region, File chunksDir) {
+        for (Chunk chunk : region.getChunks()) {
+            try (FileOutputStream outputStream = new FileOutputStream(new File(chunksDir, "chunk." + chunk.getX() + "." + chunk.getZ() + ".taco"))) {
+                outputStream.write(chunk.getUncompressedData());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void verify(ByteTest test) {
