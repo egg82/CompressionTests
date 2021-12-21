@@ -16,4 +16,4 @@ Using this library developed by Cloudflare: https://github.com/vkrasnov/dictator
 ### Zstd dictionary
 Using the Zstd library: https://github.com/facebook/zstd/releases
 
-`./zstd --train-fastcover /path/to/dir/vanilla_training/world/region/rawchunks/* -o paper.zstd.dict`
+`./zstd --train-fastcover -r /path/to/dir/vanilla_training/world/region/rawchunks/ -o paper.zstd.dict`
